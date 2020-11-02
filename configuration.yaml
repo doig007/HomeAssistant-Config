@@ -1,3 +1,5 @@
+# Home Assistant configuration
+# source: doig007/HomeAssistant-Config
 
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
@@ -6,10 +8,9 @@ default_config:
 homeassistant:
   external_url: https://home.doig.uk
 #   whitelist_external_dirs:
-#    - '/home/pi/.homeassistant/camera'
+#    - './camera'
 #  media_dirs:
 #    music: /home/pi/mnt/gdrive/Music
-#    tts: /home/pi/.homeassistant/www/tts
 
 http:
   server_port: 8123
@@ -18,24 +19,6 @@ http:
 #     swag container 
     - 172.19.0.2 
     - 127.0.0.1
-
-#  ssl_certificate: /ssl/letsencrypt/live/home.doig.uk/fullchain.pem
-#  ssl_key: /ssl/letsencrypt/live/home.doig.uk/privkey.pem
-
-
-influxdb:
-  host: 172.19.0.9
-  port: 8086
-  ssl: false
-  database: homeassistant
-  username: !secret influxdb_user
-  password: !secret influxdb_password
-  include:
-    domains:
-      - light
-      - binary_sensor
-      - sensor
-      - person
 
 # Text to speech
 tts:
@@ -52,6 +35,18 @@ scene: !include scenes.yaml
 frontend:
   themes: !include_dir_merge_named themes
 
+logger:
+  default: info
+#  logs:
+#    custom_components.xiaomi_gateway3: debug
+
+recorder:
+  db_url: !secret mariadb_url
+  purge_keep_days: 5
+  exclude:
+    domains:
+      - unifi
+
 lovelace:
   mode: storage
   # Add yaml dashboards
@@ -63,15 +58,38 @@ lovelace:
       show_in_sidebar: true
       filename: lovelace.yaml
 
-
 system_health:
 
+# Explicit declaration of yeelight since discovery is imperfect
 yeelight:
   devices:
     192.168.1.84:
       name: Nurserylight
       model: ceiling3
+      
+# Custom component used to access Nest API
+badnest:
+  user_id: !secret nest_user
+  accesstoken:  !secret nest_token
+  region: eu
 
+# Set up climate entity for badnest custom component
+climate:
+  - platform: badnest
+    scan_interval: 10
+    
+# Custom component used for voice control of various HA entities.  Uses personal google service
+google_assistant:
+  project_id: hale-trilogy-289723
+  service_account: !include HAgoogleassistant-a74a22e861d3.json
+  report_state: true
+  exposed_domains:
+    - light
+  entity_config:
+    light.yeelight:
+      name: Lighty
+
+# Custom component used for voice control of plex
 plex_assistant:
   url: 'http://192.168.1.5:32400'
   token: !secret plex_token
@@ -79,8 +97,9 @@ plex_assistant:
   language: 'en'
   tts_errors: true
 
+# LG integration conf with fixed IP of TV
 webostv:
-  host: 192.168.1.95
+  host: 192.168.1.167
   name: TV
   turn_on_action:
     service: persistent_notification.create
@@ -90,15 +109,7 @@ webostv:
     sources:
       - youtube
 
-badnest:
-  user_id: !secret nest_user
-  accesstoken:  !secret nest_token
-  region: eu
-
-climate:
-  - platform: badnest
-    scan_interval: 10
-
+# Declaration of various sensors
 sensor:
   - platform: cert_expiry
     host: home.doig.uk
@@ -108,7 +119,6 @@ sensor:
   - platform: command_line
     name: CPU Temperature
     command: "cat /sys/class/thermal/thermal_zone0/temp"
-    # If errors occur, make sure configuration file is encoded as UTF-8
     unit_of_measurement: "°C"
     value_template: '{{ value | multiply(0.001) | round(1) }}'
 
@@ -147,26 +157,16 @@ sensor:
       - lan
       - wlan
 
-logger:
-  default: info
-  logs:
-    custom_components.xiaomi_gateway3: debug
-
-
-recorder:
-  db_url: !secret mariadb_url
-  purge_keep_days: 5
-  exclude:
+influxdb:
+  host: 172.19.0.9
+  port: 8086
+  ssl: false
+  database: homeassistant
+  username: !secret influxdb_user
+  password: !secret influxdb_password
+  include:
     domains:
-      - unifi
-
-google_assistant:
-  project_id: hale-trilogy-289723
-  service_account: !include HAgoogleassistant-a74a22e861d3.json
-  report_state: true
-  exposed_domains:
-    - light
-  entity_config:
-    light.yeelight:
-      name: Lighty
-    
+      - light
+      - binary_sensor
+      - sensor
+      - person 
