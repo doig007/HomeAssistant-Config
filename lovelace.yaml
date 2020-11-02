@@ -1,0 +1,108 @@
+title: Yaml dashboard
+views:
+  - badges: null
+    cards:
+      - cards:
+          - elements:
+              - entity: sensor.oneplus_a5000_battery_level
+                type: custom:circle-sensor-card
+                max: 100
+                min: 0
+                stroke_width: 2
+                gradient: true
+                units: '%'
+                font_style:
+                  color: red
+                  font-size: 1.0em
+                  font-family: 'Trebuchet MS'
+                color_stops:
+                  18: '#55FF55'
+                  20: '#5555FF'
+                  24: '#FF5555'
+                style:
+                  top: 80%
+                  left: 20%
+                  width: 25px
+                  height: 25px
+              - entity: person.james_doig
+                style:
+                  left: 50%
+                  top: 10%
+                type: state-label
+            image: ../local/james.gif
+            type: picture-elements
+
+          - elements:
+              - entity: sensor.lya_l09_battery_level
+                style:
+                  left: 20%
+                  top: 90%
+                type: state-badge
+            image: ../local/jess.gif
+            type: picture-elements
+        type: horizontal-stack
+
+      - cards:
+          - entities:
+              - entity: sensor.hallway_thermostat
+              - entity: sensor.a4c13825dbed_temperature
+            show_header_toggle: false
+            title: 'Climate:'
+            type: entities
+
+          - entity: climate.hallway_thermostat
+            type: thermostat
+
+        type: vertical-stack
+
+      - elements:
+          - entity: binary_sensor.yeelight_nightlight
+            style:
+              left: 40%
+              top: 25%
+            type: state-badge
+
+        image: 'https://demo.home-assistant.io/stub_config/floorplan.png'
+        type: picture-elements
+
+      - entities:
+          - entity: sensor.speedtest_ping
+          - entity: sensor.speedtest_download
+
+        title: Network
+        type: glance
+
+      - entity: media_player.lg_webos_tv_0fed
+        type: media-control
+      - entity: media_player.tv
+        type: media-control
+      - entities:
+          - entity: sensor.lya_l09_battery_level
+          - entity: sensor.oneplus_a5000_do_not_disturb_sensor
+          - entity: sensor.oneplus_a5000_geocoded_location
+        show_name: false
+        title: James
+        type: glance
+    path: default_view
+    title: Home
+
+  - badges: []
+
+    cards:
+      - entity: media_player.kitchen_speaker
+        type: media-control
+    panel: false
+    path: audio
+    title: Audio
+
+  - badges: []
+
+    cards:
+      - dark_mode: true
+        entities:
+          - entity: device_tracker.oneplus_a5000
+        hours_to_show: 0
+        type: map
+    path: map
+    title: Map
+

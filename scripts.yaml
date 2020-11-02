@@ -1,0 +1,30 @@
+blink_take_photo:
+  alias: Blink  Take Photo
+  sequence:
+  - service: blink.trigger_camera
+    data: {}
+    entity_id: camera.blink_camera_1
+  - wait_template: ''
+    continue_on_timeout: true
+    timeout: 00:00:05
+  - service: blink.blink_update
+    data: {}
+  - service: camera.snapshot
+    data:
+      filename: /home/pi/.homeassistant/camera/blink_camera_still_image.jpg
+    entity_id: camera.blink_camera_1
+  mode: single
+
+
+blink_take_photo2:
+  alias: Snap Picture
+  sequence:
+  - entity_id: camera.blink_camera_1
+    service: blink.trigger_camera
+  - delay: 00:00:05
+  - data: {}
+    service: blink.blink_update
+  - data:
+      filename: /home/pi/.homeassistant/camera/blink_camera_still_image.jpg  # where you want to store still image
+      entity_id: camera.blink_camera_1  #entity id of blink camera as defined in Home Assistant
+    service: camera.snapshot

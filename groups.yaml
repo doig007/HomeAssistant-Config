@@ -1,0 +1,13 @@
+lights_livingroom:
+  name: Living Room Lights
+  entities:
+    - light.50ec50ddb4de_light
+    - light.50ec50ddbfed_light
+    - light.50ec50d89089_light
+    - light.50ec50d906d9_light
+    - light.50ec50d8fe70_light
+    - light.50ec50dd9259_light
+    - light.50ec50d8ed18_light
+    - light.50ec50d918b4_light
+    - light.50ec50ddaafc_light
+    - light.50ec50d85676_light
