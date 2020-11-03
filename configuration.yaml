@@ -38,7 +38,7 @@ frontend:
 logger:
   default: info
 #  logs:
-#    custom_components.xiaomi_gateway3: debug
+#    recorder: debug
 
 recorder:
   db_url: !secret mariadb_url
@@ -59,6 +59,10 @@ lovelace:
       filename: lovelace.yaml
 
 system_health:
+
+notify:
+
+media_player:
 
 # Explicit declaration of yeelight since discovery is imperfect
 yeelight:
@@ -170,3 +174,13 @@ influxdb:
       - binary_sensor
       - sensor
       - person 
+  exclude:
+    entities:
+      - sun.sun
+      - script.blink_take_photo
+      - sensor.cert_expiry_home_doig_uk
+      - sensor.cert_expiry_timestamp_home_doig_uk
+      - sensor.hampstead_probability_of_precipitation
+      - sensor.hampstead_weather
+      - sensor.hampstead_wind_speed 	
+
