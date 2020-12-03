@@ -37,7 +37,8 @@ frontend:
 
 logger:
   default: info
-#  logs:
+  logs:
+    custom_components:unifigateway: debug
 #    recorder: debug
 
 recorder:
@@ -46,6 +47,10 @@ recorder:
   exclude:
     domains:
       - unifi
+
+discovery:
+  ignore:
+    - yeelight
 
 lovelace:
   mode: storage
@@ -57,12 +62,32 @@ lovelace:
       icon: mdi:script
       show_in_sidebar: true
       filename: lovelace.yaml
+  # References to front-end custom cards from HACS (n.b. does not work in storage mode)
+  resources:
+    - url: /local/circle-sensor-card.js?v=0
+      type: module
+    - url: /local/custom-lovelace/home-feed-card/lovelace-home-feed-card.js?v=0.0.0
+      type: js
+    - url: /local/mini-media-player-bundle.js?v=1.11.0
+      type: module
+    - url: /local/flex-table-card.js
+      type: module
+    - url: /hacsfiles/button-card/button-card.js
+      type: module
+    - url: /local/simple-thermostat.js?v=1
+      type: module
+    - url: /local/mini-graph-card-bundle.js?v=0.9.4
+      type: module
+
 
 system_health:
 
 notify:
 
 media_player:
+
+# Use light group rather than groups.yaml to enable brightness control
+light: !include lights.yaml
 
 # Explicit declaration of yeelight since discovery is imperfect
 yeelight:
@@ -89,9 +114,12 @@ google_assistant:
   report_state: true
   exposed_domains:
     - light
+    - group
+    - script
+    - sensor
   entity_config:
-    light.yeelight:
-      name: Lighty
+    group.lights_livingroom:
+      name: Prepare the drawing room
 
 # Custom component used for voice control of plex
 plex_assistant:
@@ -155,6 +183,7 @@ sensor:
     host: 192.168.1.1
     username: !secret unifi_user
     password: !secret unifi_password
+    verify_ssl: False
     monitored_conditions:
       - www
       - wan
@@ -173,7 +202,8 @@ influxdb:
       - light
       - binary_sensor
       - sensor
-      - person 
+      - person
+      - climate 
   exclude:
     entities:
       - sun.sun
@@ -182,5 +212,5 @@ influxdb:
       - sensor.cert_expiry_timestamp_home_doig_uk
       - sensor.hampstead_probability_of_precipitation
       - sensor.hampstead_weather
-      - sensor.hampstead_wind_speed 	
+      - sensor.hampstead_wind_speed
 
