@@ -13,9 +13,9 @@ views:
               top: 25%
             type: state-badge
 
-       - type: picture-elements
-         image: ../local/james.gif
-         elements:
+      - type: picture-elements
+        image: ../local/james.gif
+        elements:
               - entity: sensor.oneplus_a5000_battery_level
                 type: custom:circle-sensor-card
                 max: 100
@@ -42,9 +42,9 @@ views:
                   top: 10%
                 type: state-label
 
-        - type: picture-elements
-          image: ../local/jess.gif
-          elements:
+      - type: picture-elements
+        image: ../local/jess.gif
+        elements:
               - entity: sensor.lya_l09_battery_level
                 style:
                   left: 20%
