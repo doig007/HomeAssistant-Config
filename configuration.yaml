@@ -212,7 +212,8 @@ influxdb:
       - binary_sensor
       - sensor
       - person
-      - climate 
+      - climate
+      - fan
   exclude:
     entities:
       - sun.sun
