@@ -179,9 +179,9 @@ sensor:
           {% set state = states('sensor.hallway_thermostat_hvac_action') %}
           {% set id = mapper[state] if state in mapper %}
           {{ id }}
-     average_aqi:
-        value_template: >
-          {{ state_attr('fan.xiaomi_miio_device', 'average_aqi') }}
+     aqi:
+        value_template:
+          {{ state_attr('fan.xiaomi_miio_device', 'aqi') }}
 
      unifi_wanip:
        friendly_name: "WAN IP address"
