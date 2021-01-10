@@ -96,10 +96,16 @@ yeelight:
       name: Nurserylight
       model: ceiling3
       
+# Xiaomi air purifier      
+fan:
+  - platform: xiaomi_miio
+    host: 192.168.1.120
+    token: !secret fan_token    
+          
 # Custom component used to access Nest API
 badnest:
   user_id: !secret nest_user
-  accesstoken:  !secret nest_token
+  accesstoken: !secret nest_token
   region: eu
 
 # Set up climate entity for badnest custom component
