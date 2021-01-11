@@ -5,7 +5,7 @@ views:
     badges: null
     cards:
       - type: picture-elements
-        image: 'https://demo.home-assistant.io/stub_config/floorplan.png'
+        image: ../local/floorplan.png
         elements:
           - entity: binary_sensor.yeelight_nightlight
             style:
