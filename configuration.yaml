@@ -180,8 +180,9 @@ sensor:
           {% set id = mapper[state] if state in mapper %}
           {{ id }}
      aqi:
-        value_template: >
-          {{ state_attr('fan.xiaomi_miio_device', 'aqi')|float  }}
+        value_template: "{{ state_attr('fan.xiaomi_miio_device', 'aqi')|float  }}"
+        unit_of_measurement: "µg/m3"
+        friendly_name: "Air quality"
 
      unifi_wanip:
        friendly_name: "WAN IP address"
