@@ -189,6 +189,11 @@ sensor:
        unit_of_measurement: ''
        value_template: "{{ state_attr('sensor.unifi_gateway_wan', 'wan_ip') }}"
 
+     hallway_temperature:
+       friendly_name: "Hallway temperature"
+       unit_of_measurement: '°C'
+       value_template: "{{ state_attr('climate.hallway_thermostat', 'current_temperature') | round(1) }}"      
+    
   - platform: unifigateway
     host: 192.168.1.1
     username: !secret unifi_user
