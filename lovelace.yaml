@@ -8,11 +8,31 @@ views:
       - type: picture-elements
         image: ../local/floorplan.png
         elements:
-          - entity: binary_sensor.yeelight_nightlight
+          - entity: sensor.aqi
             style:
               left: 40%
               top: 25%
+              font-size: 17px
             type: state-badge
+          - entity: sensor.a4c13825dbed_temperature
+            style:
+              left: 50%
+              top: 25%
+              font-size: 17px
+            type: state-badge
+          - entity: sensor.hallway_thermostat
+            style:
+              left: 55%
+              top: 50%
+              font-size: 17px
+            type: state-badge
+          - entity: sensor.a4c138525fc5_temperature
+            style:
+              left: 37%
+              top: 80%
+              font-size: 17px
+            type: state-badge   
+          
 
       - type: picture-elements
         image: ../local/james.gif

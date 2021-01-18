@@ -62,13 +62,20 @@ lovelace:
       icon: mdi:script
       show_in_sidebar: true
       filename: lovelace.yaml
+    floorplan-yaml:
+      mode: yaml
+      title: Floorplan
+      icon: mdi:script
+      show_in_sidebar: true
+      filename: floorplan.yaml
+
   # References to front-end custom cards from HACS (n.b. does not work in storage mode)
   resources:
-    - url: /local/circle-sensor-card.js?v=0
+    - url: /local/circle-sensor-card.js
       type: module
-    - url: /local/custom-lovelace/home-feed-card/lovelace-home-feed-card.js?v=0.0.0
+    - url: /local/custom-lovelace/home-feed-card/lovelace-home-feed-card.js
       type: js
-    - url: /local/mini-media-player-bundle.js?v=1.11.0
+    - url: /local/mini-media-player-bundle.js
       type: module
     - url: /local/flex-table-card.js
       type: module
@@ -76,9 +83,10 @@ lovelace:
       type: module
     - url: /local/simple-thermostat.js?v=1
       type: module
-    - url: /local/mini-graph-card-bundle.js?v=0.9.4
+    - url: /local/mini-graph-card-bundle.js
       type: module
-
+    - url: /local/ha-floorplan/floorplan.js
+      type: module 
 
 system_health:
 
