@@ -7,25 +7,18 @@ default_config:
 
 homeassistant:
   external_url: https://home.doig.uk
-#   whitelist_external_dirs:
-#    - './camera'
-#  media_dirs:
-#    music: /home/pi/mnt/gdrive/Music
 
 http:
   server_port: 8123
   use_x_forwarded_for: true
   trusted_proxies:
-#     swag container 
-    - 172.19.0.2 
-    - 127.0.0.1
-
-# Text to speech
-tts:
-  - platform: google_translate
-    service_name: google_say
-    base_url: https://home.doig.uk
-    cache_dir: /config/www/tts
+    - 172.21.0.2
+    - 172.21.0.3
+    - 172.21.0.4
+    - 172.21.0.5
+    - 172.21.0.6
+    - 172.21.0.7
+    - 172.21.0.8
 
 group: !include groups.yaml
 automation: !include automations.yaml
@@ -35,58 +28,61 @@ scene: !include scenes.yaml
 frontend:
   themes: !include_dir_merge_named themes
 
-logger:
-  default: info
-  logs:
-    custom_components:unifigateway: debug
-#    recorder: debug
-
 recorder:
-  db_url: !secret mariadb_url
-  purge_keep_days: 5
-  exclude:
-    domains:
-      - unifi
-
-discovery:
-  ignore:
-    - yeelight
+  purge_keep_days: 5000
+  include:
+    entity_globs:
+      - sensor.octopus_energy*
+      - sensor.sw_*
+    entities:
+      - sensor.hampstead_weather
+      - media_player.tv_2
+      - climate.hallway
+      - sensor.hallway_humidity
+      - sensor.hallway_temperature
+      - sensor.xiaomi_miio_device_humidity
+      - sensor.xiaomi_miio_device_temperature
+      - sensor.xiaomi_miio_device_pm2_5
+      - sensor.electricity_current_rate
+      - sensor.electricity_next_rate
+      - sensor.last_3_days_electricity_rate
+      - sensor.electricity_consumption_prev_hh
+      - sensor.appliance_on_counter_sensor_sw_washing_machine_power
+      - sensor.appliance_sensor_sensor_sw_washing_machine_power
 
 lovelace:
-  mode: storage
+  mode: yaml
   # Add yaml dashboards
   dashboards:
     lovelace-yaml:
       mode: yaml
-      title: YAML
-      icon: mdi:script
+      title: Floorplan
+      icon: mdi:floor-plan
       show_in_sidebar: true
       filename: lovelace.yaml
-    floorplan-yaml:
-      mode: yaml
-      title: Floorplan
-      icon: mdi:script
-      show_in_sidebar: true
-      filename: floorplan.yaml
 
   # References to front-end custom cards from HACS (n.b. does not work in storage mode)
   resources:
-    - url: /local/circle-sensor-card.js
+    - url: /hacsfiles/circle-sensor-card/circle-sensor-card.js
       type: module
-    - url: /local/custom-lovelace/home-feed-card/lovelace-home-feed-card.js
+    - url: /hacsfiles/lovelace-home-feed-card/lovelace-home-feed-card.js
       type: js
-    - url: /local/mini-media-player-bundle.js
+    - url: /hacsfiles/mini-media-player-bundle.js
       type: module
-    - url: /local/flex-table-card.js
+    - url: /hacsfiles/flex-table-card/flex-table-card.js
       type: module
     - url: /hacsfiles/button-card/button-card.js
       type: module
-    - url: /local/simple-thermostat.js?v=1
+    - url: /hacsfiles/simple-thermostat/simple-thermostat.js
       type: module
-    - url: /local/mini-graph-card-bundle.js
+    - url: /hacsfiles/min-graph-card/mini-graph-card-bundle.js
       type: module
-    - url: /local/ha-floorplan/floorplan.js
-      type: module 
+    - url: /hacsfiles/lovelace-multiple-entity-row/multiple-entity-row.js
+      type: module
+    - url: /hacsfiles/apexcharts-card/apexcharts-card.js
+      type: module
+    - url: /hacsfiles/button-text-card/button-text-card.js
+      type: module
 
 system_health:
 
@@ -100,30 +96,25 @@ light: !include lights.yaml
 # Explicit declaration of yeelight since discovery is imperfect
 yeelight:
   devices:
-    192.168.1.84:
+    192.168.4.84:
       name: Nurserylight
       model: ceiling3
       
 # Xiaomi air purifier      
-fan:
-  - platform: xiaomi_miio
-    host: 192.168.1.120
-    token: !secret fan_token    
-          
-# Custom component used to access Nest API
-badnest:
-  user_id: !secret nest_user
-  accesstoken: !secret nest_token
-  region: eu
+# fan:
+#  - platform: xiaomi_miio
+#    host: 192.168.4.120
+#    token: !secret fan_token    
+              
+nest:
+  client_id: !secret nest_client_id
+  client_secret: !secret nest_client_secret
+  project_id: !secret nest_project_id
+  subscriber_id: projects/newnestapiforha/subscriptions/nestHA
 
-# Set up climate entity for badnest custom component
-climate:
-  - platform: badnest
-    scan_interval: 10
-    
 # Custom component used for voice control of various HA entities.  Uses personal google service
 google_assistant:
-  project_id: hale-trilogy-289723
+  project_id: "hale-trilogy-289723"
   service_account: !include HAgoogleassistant-a74a22e861d3.json
   report_state: true
   exposed_domains:
@@ -135,106 +126,91 @@ google_assistant:
     group.lights_livingroom:
       name: Prepare the drawing room
 
-# Custom component used for voice control of plex
-plex_assistant:
-  url: 'http://192.168.1.5:32400'
-  token: !secret plex_token
-  default_cast: 'TV'
-  language: 'en'
-  tts_errors: true
+template:
+    - sensor:
+      - name: "Electricity current rate"
+        unique_id: electricity_rate
+        state: "{{ states('sensor.octopus_energy_electricity_21j0023364_1200037135231_current_rate')| float * 100}}"
+        unit_of_measurement: "p/kWh"
+        icon: mdi:currency-gbp
+        state_class: measurement
 
-# LG integration conf with fixed IP of TV
-webostv:
-  host: 192.168.1.167
-  name: TV
-  turn_on_action:
-    service: persistent_notification.create
-    data:
-      message: "Turn on action"
-  customize:
-    sources:
-      - youtube
+      - name: "Electricity next rate"
+        unique_id: electricity_next_rate
+        state: "{{ states('sensor.octopus_energy_electricity_21j0023364_1200037135231_next_rate')| float * 100}}"
+        unit_of_measurement: "p/kWh"
+        icon: mdi:currency-gbp
+        state_class: measurement 
+
+      - name: "Electricity consumption prev HH"
+        unique_id: electricity_HH_consumption
+        state: >
+          {% set entries = state_attr('sensor.octopus_energy_electricity_21j0023364_1200037135231_current_accumulative_consumption','charges') | count  %}
+          {% set last = state_attr('sensor.octopus_energy_electricity_21j0023364_1200037135231_current_accumulative_consumption','charges')[entries-2] %}
+          {{ last.consumption }}
+        unit_of_measurement: "kWh"
+        state_class: measurement
+        attributes:
+          start_period: >
+            {% set entries = state_attr('sensor.octopus_energy_electricity_21j0023364_1200037135231_current_accumulative_consumption','charges')| count %}
+            {% set last = state_attr('sensor.octopus_energy_electricity_21j0023364_1200037135231_current_accumulative_consumption','charges')[entries-2] %}
+            {{ last.start }}
+          end_period: >
+            {% set entries = state_attr('sensor.octopus_energy_electricity_21j0023364_1200037135231_current_accumulative_consumption','charges') | count %}
+            {% set last = state_attr('sensor.octopus_energy_electricity_21j0023364_1200037135231_current_accumulative_consumption','charges')[entries-2] %}
+            {{ last.end }}
+          avg_power: >
+            {% set entries = state_attr('sensor.octopus_energy_electricity_21j0023364_1200037135231_current_accumulative_consumption','charges') | count %}
+            {% set last = state_attr('sensor.octopus_energy_electricity_21j0023364_1200037135231_current_accumulative_consumption','charges')[entries-2] %}
+            {{ last.consumption / 0.5 *1000 }}
+
+#        - name: "WAN IP address"
+#          unique_id: unifi_wanip
+#          unit_of_measurement: ""
+#          state: "{{ state_attr('sensor.unifi_gateway_wan', 'wan_ip') }}"  
 
 # Declaration of various sensors
 sensor:
-  - platform: cert_expiry
-    host: home.doig.uk
+    - platform: average
+      name: "Last 3 days electricity rate"
+      unique_id: last_3_days_electricity_rate
+      entities:
+        - sensor.electricity_current_rate
+      # Last 3 days: ends today at 00:00, lasts 3 days. 
+      end: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
+      duration:
+         days: 3
 
-  - platform: badnest
 
-  - platform: command_line
-    name: CPU Temperature
-    command: "cat /sys/class/thermal/thermal_zone0/temp"
-    unit_of_measurement: "°C"
-    value_template: '{{ value | multiply(0.001) | round(1) }}'
+    - platform: integration
+      source: sensor.sw_washing_machine_power
+      name: sw_washing_machine_consumption
+      unit_time: min
+ 
 
-  - platform: attributes
-    friendly_name: "Boiler"
-    attribute: hvac_action
-    unit_of_measurement: ""
-    entities:
-      - climate.hallway_thermostat
-
-  - platform: plex_assistant
-
-  - platform: template
-    sensors:
-     hvac_action:
-        value_template: >
-          {% set mapper =
-            { 'idle':'0',
-              'heating':'100'} %}   
-          {% set state = states('sensor.hallway_thermostat_hvac_action') %}
-          {% set id = mapper[state] if state in mapper %}
-          {{ id }}
-     aqi:
-        value_template: "{{ state_attr('fan.xiaomi_miio_device', 'aqi')|float  }}"
-        unit_of_measurement: "µg/m3"
-        friendly_name: "Air quality"
-
-     unifi_wanip:
-       friendly_name: "WAN IP address"
-       unit_of_measurement: ''
-       value_template: "{{ state_attr('sensor.unifi_gateway_wan', 'wan_ip') }}"
-
-     hallway_temperature:
-       friendly_name: "Hallway temperature"
-       unit_of_measurement: '°C'
-       value_template: "{{ state_attr('climate.hallway_thermostat', 'current_temperature') | round(1) }}"      
-    
-  - platform: unifigateway
-    host: 192.168.1.1
-    username: !secret unifi_user
-    password: !secret unifi_password
-    verify_ssl: False
-    monitored_conditions:
-      - www
-      - wan
-      - lan
-      - wlan
+#  - platform: command_line
+#    name: CPU Temperature
+#    command: "cat /sys/class/thermal/thermal_zone0/temp"
+#    unit_of_measurement: "°C"
+#    value_template: '{{ value | multiply(0.001) | round(1) }}'
+#     hvac_action:
+#        value_template: >
+#          {% set mapper =
+#            { 'idle':'0',
+#              'heating':'100'} %}   
+#          {% set state = states('sensor.hallway_thermostat_hvac_action') %}
+#          {% set id = mapper[state] if state in mapper %}
+#          {{ id }}
+#
 
 influxdb:
-  host: 172.19.0.9
+  host: 192.168.1.5
+  api_version: 2
   port: 8086
   ssl: false
-  database: homeassistant
-  username: !secret influxdb_user
-  password: !secret influxdb_password
+  bucket: HomeAssistant
+  organization: !secret influxdb_org
+  token: !secret influxdb_token
   include:
     domains:
-      - light
-      - binary_sensor
       - sensor
-      - person
-      - climate
-      - fan
-  exclude:
-    entities:
-      - sun.sun
-      - script.blink_take_photo
-      - sensor.cert_expiry_home_doig_uk
-      - sensor.cert_expiry_timestamp_home_doig_uk
-      - sensor.hampstead_probability_of_precipitation
-      - sensor.hampstead_weather
-      - sensor.hampstead_wind_speed
-
